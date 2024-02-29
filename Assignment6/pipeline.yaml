@@ -1,0 +1,58 @@
+name: CI/CD Pipeline
+
+on:
+    push:
+        branches:
+          - main
+
+jobs:
+    build: 
+        runs-on: ubuntu-latest
+
+        steps:
+        - name: Checkout code
+          uses: actions/checkout@v2
+
+        - name: Setup .Net
+          uses: actions/setup-dotnet@v2
+          with:
+            dotnet-version: '6.0.0'
+
+        - name: Restore dependencies
+          run: dotnet restore
+
+        - name: Build 
+          run: dotnet build --configuration Release
+
+    unit-test:
+        needs: build
+        runs-on: ubuntu-latest
+
+        steps:
+        - name: Checkout Code
+          uses: actions/checkout@v2
+
+        - name: Setup .Net
+          uses: actions/setup-dotnet@v2
+          with: 
+            dotnet-version: '6.0.0'
+
+        - name: Run Unit tests
+          run: dotnet test --configuration Release --no-build
+
+    integration-test:
+        needs: unit-test
+        runs-on: ubuntu-latest
+
+        steps:
+        - name: Checkout Code
+          uses: actions/checkout@v2
+
+        - name: Setup .Net
+          uses: actions/setup-dotnet@v2
+          with: 
+            dotnet-version: '6.0.0'
+
+        - name: Run Integration tests
+          run: dotnet test --configuration Release
+    
